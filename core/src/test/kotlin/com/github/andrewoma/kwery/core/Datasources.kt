@@ -30,6 +30,8 @@ val hsqlDataSource = HikariDataSource().apply {
 
 val postgresDataSource = HikariDataSource().apply {
     jdbcUrl = "jdbc:postgresql://localhost:5432/kwery"
+    username = "kwery"
+    password = "kwery"
 }
 
 val mysqlDataSource = HikariDataSource().apply {

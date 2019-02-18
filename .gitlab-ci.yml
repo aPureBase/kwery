@@ -10,12 +10,17 @@ before_script:
 tests:
   stage: test
   variables:
+    # MySQL
     MYSQL_DATABASE: kwery
-    POSTGRES_DB: kwery
-    POSTGRES_USER: kwery
     MYSQL_USER: kwery
     MYSQL_ROOT_PASSWORD: kwery
+
+    # Postgres
+    POSTGRES_DB: kwery
+    POSTGRES_USER: kwery
     POSTGRES_PASSWORD: kwery
+
+    # Non Services variables
     GRADLE_OPTS: "-Dorg.gradle.daemon=false"
   services:
     - postgres
@@ -25,4 +30,5 @@ tests:
       - build
       - .gradle
   script:
+    - echo test
     - ./gradlew --info check

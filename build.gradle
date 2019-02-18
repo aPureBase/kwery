@@ -28,9 +28,12 @@ allprojects {
         compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
         compile "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
         compile "org.slf4j:slf4j-api:$slf4jVersion"
-
-        testCompile "junit:junit:$junitVersion"
+        
         testCompile "org.jetbrains.kotlin:kotlin-test-junit:$kotlinVersion"
+        testCompile "org.jmockit:jmockit:1.45"
+        testRuntime "org.junit.jupiter:junit-jupiter-engine:$junitVersion"
+        testImplementation "org.junit.jupiter:junit-jupiter-api:$junitVersion"
+        testImplementation 'org.amshove.kluent:kluent:1.34'
     }
 }
 
@@ -64,16 +67,14 @@ subprojects {
     }
 
     test {
-
         useJUnitPlatform {
             excludeTags 'slow'
             includeEngines 'junit-jupiter'
         }
 
         testLogging {
-            showStandardStreams = false
-            exceptionFormat "full"
             events "failed"
+            exceptionFormat "full"
         }
 
         failFast = false
