@@ -1,17 +1,10 @@
-buildscript {
-    repositories {
-        jcenter()
-    }
-    dependencies {
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
-        classpath "com.github.ben-manes:gradle-versions-plugin:0.20.0"
-    }
+plugins {
+    id "org.jetbrains.kotlin.jvm" version "1.3.21" apply false // apply false has to be used with sub projets
+    id "com.github.ben-manes.versions" version "0.20.0" apply false
 }
 
 allprojects {
     group = 'com.github.andrewoma'
-    apply plugin: 'com.github.ben-manes.versions'
-
     version version
 
     apply plugin: 'kotlin'
@@ -23,13 +16,12 @@ allprojects {
         mavenCentral()
     }
 
-
     dependencies {
-        compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
-        compile "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
+        compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+        compile "org.jetbrains.kotlin:kotlin-reflect"
         compile "org.slf4j:slf4j-api:$slf4jVersion"
-        
-        testCompile "org.jetbrains.kotlin:kotlin-test-junit:$kotlinVersion"
+
+        testCompile "org.jetbrains.kotlin:kotlin-test-junit"
         testCompile "org.jmockit:jmockit:1.45"
         testRuntime "org.junit.jupiter:junit-jupiter-engine:$junitVersion"
         testImplementation "org.junit.jupiter:junit-jupiter-api:$junitVersion"
