@@ -1,228 +1,89 @@
 buildscript {
-    ext {
-        kotlinVersion = '1.1.3-2'
-        kommonVersion = '0.14'
-        junitVersion = '4.12'
-        slf4jVersion = '1.7.21'
-        logbackVersion = '1.1.7'
-        hsqlVersion = '2.3.4'
-        postgresVersion = '9.4.1208'
-        mysqlVersion = '5.1.38'
-        jerseyVersion = '2.23.1'
-        dropwizardVersion = '1.0.0'
-        jacksonVersion = '2.7.0'
-        h2Version = '1.4.190'
-        aopVersion = '1.0'
-        cglibVersion = '3.2.4'
-        hikariVersion = '2.4.6'
-    }
     repositories {
-        maven {
-            url "http://dl.bintray.com/kotlin/kotlin-eap-1.1"
-        }
-
         jcenter()
     }
     dependencies {
-        classpath(
-                "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion",
-                'com.github.jengelman.gradle.plugins:shadow:1.2.2',
-                'com.bmuschko:gradle-nexus-plugin:2.3.1',
-                'net.researchgate:gradle-release:2.1.2',
-                'com.github.ben-manes:gradle-versions-plugin:0.11.3',
-                'com.netflix.nebula:gradle-extra-configurations-plugin:3.0.3'
-        )
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
+        classpath "com.github.ben-manes:gradle-versions-plugin:0.20.0"
     }
 }
 
-apply plugin: 'net.researchgate.release'
-
-createReleaseTag.dependsOn ':core:uploadArchives', ':fetcher:uploadArchives', ':mapper:uploadArchives',
-        ':transactional:uploadArchives', ':transactional-jersey:uploadArchives'
-
 allprojects {
-    group = 'com.github.andrewoma.kwery'
+    group = 'com.github.andrewoma'
     apply plugin: 'com.github.ben-manes.versions'
+
+    version version
+
+    apply plugin: 'kotlin'
+    apply plugin: 'maven-publish'
+    apply plugin: 'com.github.ben-manes.versions'
+
+    repositories {
+        jcenter()
+        mavenCentral()
+    }
+
+
+    dependencies {
+        compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
+        compile "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
+        compile "org.slf4j:slf4j-api:$slf4jVersion"
+
+        testCompile "junit:junit:$junitVersion"
+        testCompile "org.jetbrains.kotlin:kotlin-test-junit:$kotlinVersion"
+    }
 }
 
 subprojects {
-    apply plugin: 'maven'
-    apply plugin: 'java'
-    apply plugin: 'kotlin'
-    apply plugin: 'jacoco'
-    apply from: '../publish.gradle'
-
-    repositories {
-        maven {
-            url "http://dl.bintray.com/kotlin/kotlin-eap-1.1"
+    sourceSets {
+        main {
+            kotlin {
+                srcDir "src/main/kotlin"
+            }
+            resources {
+                srcDir "src/main/resources"
+            }
         }
-        mavenCentral()
-        mavenLocal()
-    }
-    dependencies {
-        compile(
-                "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion",
-                "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion",
-                "org.slf4j:slf4j-api:$slf4jVersion",
-        )
-        testCompile(
-                "junit:junit:$junitVersion",
-                "org.jetbrains.kotlin:kotlin-test-junit:$kotlinVersion",
-        )
-    }
-
-    compileKotlin {
-//        kotlinOptions.moduleName = "${project.group}.${project.name}"
-    }
-
-    task coverage(dependsOn: 'jacocoTestReport') << {
-        def reports = new File(project.buildDir, '/reports/jacoco/test/html')
-        def indexFile = new File(reports, 'index.html')
-        if (!indexFile.exists()) return
-        def index = indexFile.getText('UTF-8')
-        def footer = '<div class="footer">'
-        def result = new StringBuilder(index.substring(0, index.indexOf(footer)))
-
-        reports.eachDirMatch({ !new File(it).name.startsWith(".") }) { dir ->
-            def moduleIndex = new File(dir, 'index.source.html')
-            def content = moduleIndex.getText('UTF-8')
-                    .replaceAll('\\.\\./\\.resources', '.resources')
-                    .replaceAll('href="', "href=\"${dir.name}/")
-            result.append(content.substring(content.indexOf('<h1>'), content.indexOf(footer)))
+        test {
+            kotlin {
+                srcDir "src/test/kotlin"
+            }
+            resources {
+                srcDir "src/test/resources"
+            }
         }
-        result.append(index.substring(index.indexOf(footer)))
+    }
 
-        def output = new File(reports, 'index.source.html')
+    task sourcesJar(type: Jar) {
+        classifier = 'sources'
+        from sourceSets.main.allSource
+    }
 
-        output.delete()
-        output << result.toString()
-        println("open $output.path")
+    artifacts {
+        archives sourcesJar
     }
 
     test {
-        exclude '**/Abstract*'
-    }
-}
 
-project(':fetcher') {
-    dependencies {
-        testCompile(
-                "com.github.andrewoma.kommon:kommon:$kommonVersion",
-        )
-    }
-}
+        useJUnitPlatform {
+            excludeTags 'slow'
+            includeEngines 'junit-jupiter'
+        }
 
-project(':mapper') {
-    dependencies {
-        compile(
-                project(':core'),
-                "com.github.andrewoma.kommon:kommon:$kommonVersion",
-        )
-        testCompile(
-                project(':fetcher'),
-                "com.zaxxer:HikariCP:$hikariVersion",
-                "ch.qos.logback:logback-classic:$logbackVersion",
-                "org.hsqldb:hsqldb:$hsqlVersion",
-                "mysql:mysql-connector-java:$mysqlVersion",
-        )
-    }
-}
+        testLogging {
+            showStandardStreams = false
+            exceptionFormat "full"
+            events "failed"
+        }
 
-project(':core') {
-    apply plugin: 'nebula.optional-base'
+        failFast = false
 
-    dependencies {
-        compile(
-                "com.github.andrewoma.kommon:kommon:$kommonVersion",
-        )
-        compile "org.jetbrains:annotations:15.0", optional
-        testCompile(
-                "com.zaxxer:HikariCP:$hikariVersion",
-                "ch.qos.logback:logback-classic:$logbackVersion",
-                "org.hsqldb:hsqldb:$hsqlVersion",
-                "org.postgresql:postgresql:$postgresVersion",
-                "mysql:mysql-connector-java:$mysqlVersion",
-                "org.xerial:sqlite-jdbc:3.8.11.2",
-        )
-    }
-}
-
-project(':transactional') {
-    dependencies {
-        compile(
-                project(':core'),
-                "aopalliance:aopalliance:$aopVersion",
-                "cglib:cglib-nodep:$cglibVersion",
-        )
-        testCompile(
-                "com.zaxxer:HikariCP:$hikariVersion",
-                "ch.qos.logback:logback-classic:$logbackVersion",
-                "org.hsqldb:hsqldb:$hsqlVersion",
-        )
-    }
-}
-
-project(':transactional-jersey') {
-    dependencies {
-        compile(
-                project(':core'),
-                "org.glassfish.jersey.core:jersey-server:$jerseyVersion",
-        )
-        testCompile(
-                "com.zaxxer:HikariCP:$hikariVersion",
-                "ch.qos.logback:logback-classic:$logbackVersion",
-                "org.hsqldb:hsqldb:$hsqlVersion",
-                "org.glassfish.jersey.core:jersey-server:$jerseyVersion",
-                "io.dropwizard:dropwizard-testing:$dropwizardVersion",
-        )
-    }
-}
-
-project(':example') {
-    apply plugin: 'com.github.johnrengelman.shadow'
-    apply plugin: 'application'
-
-    dependencies {
-        compile(
-                project(':core'),
-                project(':mapper'),
-                project(':fetcher'),
-                project(':transactional-jersey'),
-                "org.hsqldb:hsqldb:$hsqlVersion",
-                "io.dropwizard:dropwizard-core:$dropwizardVersion",
-                "io.dropwizard:dropwizard-db:$dropwizardVersion",
-                "io.dropwizard:dropwizard-assets:$dropwizardVersion",
-                "org.hsqldb:hsqldb:$hsqlVersion",
-                "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonVersion",
-                "org.postgresql:postgresql:$postgresVersion",
-                "com.github.andrewoma.kommon:kommon:$kommonVersion",
-        )
-        testCompile(
-                "io.dropwizard:dropwizard-testing:$dropwizardVersion"
-        )
-    }
-
-    shadowJar {
-        mergeServiceFiles()
-        exclude 'META-INF/*.DSA'
-        exclude 'META-INF/*.RSA'
-    }
-
-    mainClassName = 'com.github.andrewoma.kwery.example.film.MainKt'
-
-    applicationDefaultJvmArgs = ["-Xmx512m"]
-
-    run {
-        args project.hasProperty("appArgs") ? Eval.me(appArgs) : ['server', 'src/main/resources/dev.yml']
-    }
-
-    jar {
-        manifest {
-            attributes('Main-Class': mainClassName, "Implementation-Version": version)
+        doFirst {
+            def jMockit = configurations.testCompile.find {
+                it.name.startsWith("jmockit-")
+            }
+            jvmArgs "-javaagent:${jMockit}"
         }
     }
 }
 
-task wrapper(type: Wrapper) {
-    gradleVersion = '2.9'
-}

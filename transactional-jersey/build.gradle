@@ -1,0 +1,13 @@
+dependencies {
+    compile(
+            project(':core'),
+            "org.glassfish.jersey.core:jersey-server:$jerseyVersion",
+    )
+    testCompile(
+            "com.zaxxer:HikariCP:$hikariVersion",
+            "ch.qos.logback:logback-classic:$logbackVersion",
+            "org.hsqldb:hsqldb:$hsqlVersion",
+            "org.glassfish.jersey.core:jersey-server:$jerseyVersion",
+            "io.dropwizard:dropwizard-testing:$dropwizardVersion",
+    )
+}

@@ -1,0 +1,42 @@
+//apply plugin: 'com.github.johnrengelman.shadow'
+//apply plugin: 'application'
+
+//dependencies {
+//    compile(
+//            project(':core'),
+//            project(':mapper'),
+//            project(':fetcher'),
+//            project(':transactional-jersey'),
+//            "org.hsqldb:hsqldb:$hsqlVersion",
+//            "io.dropwizard:dropwizard-core:$dropwizardVersion",
+//            "io.dropwizard:dropwizard-db:$dropwizardVersion",
+//            "io.dropwizard:dropwizard-assets:$dropwizardVersion",
+//            "org.hsqldb:hsqldb:$hsqlVersion",
+//            "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonVersion",
+//            "org.postgresql:postgresql:$postgresVersion",
+//            "com.github.andrewoma.kommon:kommon:$kommonVersion",
+//    )
+//    testCompile(
+//            "io.dropwizard:dropwizard-testing:$dropwizardVersion"
+//    )
+//}
+//
+//shadowJar {
+//    mergeServiceFiles()
+//    exclude 'META-INF/*.DSA'
+//    exclude 'META-INF/*.RSA'
+//}
+//
+//mainClassName = 'com.github.andrewoma.kwery.example.film.MainKt'
+//
+//applicationDefaultJvmArgs = ["-Xmx512m"]
+//
+//run {
+//    args project.hasProperty("appArgs") ? Eval.me(appArgs) : ['server', 'src/main/resources/dev.yml']
+//}
+//
+//jar {
+//    manifest {
+//        attributes('Main-Class': mainClassName, "Implementation-Version": version)
+//    }
+//}

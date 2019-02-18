@@ -1,0 +1,12 @@
+dependencies {
+    compile(
+            project(':core'),
+            "aopalliance:aopalliance:$aopVersion",
+            "cglib:cglib-nodep:$cglibVersion",
+    )
+    testCompile(
+            "com.zaxxer:HikariCP:$hikariVersion",
+            "ch.qos.logback:logback-classic:$logbackVersion",
+            "org.hsqldb:hsqldb:$hsqlVersion",
+    )
+}

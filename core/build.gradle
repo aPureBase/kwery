@@ -1,0 +1,15 @@
+plugins {
+    id 'com.github.johnrengelman.shadow' version '4.0.4'
+}
+
+dependencies {
+    compile "com.github.andrewoma.kommon:kommon:$kommonVersion"
+    compile "org.jetbrains:annotations:15.0"
+
+    testCompile "com.zaxxer:HikariCP:$hikariVersion"
+    testCompile "ch.qos.logback:logback-classic:$logbackVersion"
+    testCompile "org.hsqldb:hsqldb:$hsqlVersion"
+    testCompile "org.postgresql:postgresql:$postgresVersion"
+    testCompile "mysql:mysql-connector-java:$mysqlVersion"
+    testCompile "org.xerial:sqlite-jdbc:$sqliteVersion"
+}
