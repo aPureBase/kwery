@@ -22,6 +22,14 @@
 
 package com.github.andrewoma.kwery.core.builder
 
-class Query(val sqlBuffer: StringBuilder, val parameters: Map<String, Any?>) {
+class Query(private val sqlBuffer: StringBuilder, val parameters: Map<String, Any?>) {
     val sql: String by lazy { sqlBuffer.toString() }
+
+    private fun union(kQuery: Query, unionType: String) = Query(
+        StringBuilder("$sql $unionType ${kQuery.sql}"),
+        parameters + kQuery.parameters
+    )
+
+    infix fun union(kQuery: Query) = union(kQuery, unionType = "UNION")
+    infix fun unionAll(kQuery: Query) = union(kQuery, unionType = "UNION ALL")
 }

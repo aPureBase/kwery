@@ -58,6 +58,7 @@ subprojects {
         }
         mavenCentral()
         mavenLocal()
+        jcenter()
     }
     dependencies {
         compile(
@@ -143,6 +144,7 @@ project(':core') {
                 "org.postgresql:postgresql:$postgresVersion",
                 "mysql:mysql-connector-java:$mysqlVersion",
                 "org.xerial:sqlite-jdbc:3.8.11.2",
+                "org.amshove.kluent:kluent:1.47"
         )
     }
 }

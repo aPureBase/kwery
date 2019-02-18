@@ -41,13 +41,14 @@ class QueryBuilder {
     private var groupBy: String? = null
     private var having: String? = null
     private var orderBy: String? = null
+    private val joins: JoinGroup = JoinGroup()
 
     fun select(table: String) {
         selects.add(table)
     }
 
     fun parameter(name: String, value: Any?) {
-        params.put(name, value)
+        params[name] = value
     }
 
     fun groupBy(groupBy: String) {
@@ -62,13 +63,27 @@ class QueryBuilder {
         this.orderBy = orderBy
     }
 
-    fun whereGroup(operator: String = "and", block: FilterBuilder.() -> Unit) {
-        require(filters.countLeaves() == 0) { "There must be only one root filters group" }
-        filters = Filter.Group(operator)
-        block(FilterBuilder(filters))
+    fun whereGroup(operator: String = "and", block: FilterBuilder.() -> Unit): Unit = when (filters.countLeaves()) {
+        0 -> {
+            filters = Filter.Group(operator)
+            block(FilterBuilder(filters))
+        }
+        2 -> {
+            val wrapper = Filter.Group("and")
+            wrapper.filters.add(this@QueryBuilder.filters)
+            block(FilterBuilder(wrapper))
+            filters = wrapper
+        }
+        else -> {
+            val group = Filter.Group(operator)
+            block(FilterBuilder(group))
+            filters.filters.add(group)
+            Unit
+        }
     }
 
     inner class FilterBuilder(private val group: Filter.Group) {
+        val parameter = this@QueryBuilder::parameter
 
         fun where(where: String) {
             group.filters.add(Filter.Where(where))
@@ -81,10 +96,15 @@ class QueryBuilder {
         }
     }
 
+    fun joinGroup(block: JoinGroup.() -> Unit) {
+        joins.addBuilder(block)
+    }
+
     fun build(sb: StringBuilder = StringBuilder(), block: QueryBuilder.() -> Unit): Query {
         block(this)
 
         selects.joinTo(sb, "\n")
+        if (joins.builders.isNotEmpty()) { sb.append("\n").append(joins.build()) }
         if (filters.countLeaves() != 0) {
             sb.append("\nwhere ")
             appendConditions(sb, filters, true)
