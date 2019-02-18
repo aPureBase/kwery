@@ -1,0 +1,27 @@
+version: '3.6'
+
+services:
+  mysql:
+    image: mysql
+    environment:
+      MYSQL_DATABASE: kwery
+      MYSQL_ROOT_PASSWORD: kwery
+    ports:
+      - 3306:3306
+
+  postgres:
+    image: postgres
+    environment:
+      POSTGRES_DB: kwery
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: kwery
+    ports:
+      - 5432:5432
+
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server
+    environment:
+      ACCEPT_EULA: Y
+      SA_PASSWORD: yourStrong(!)Password
+    ports:
+      - 1433:1433

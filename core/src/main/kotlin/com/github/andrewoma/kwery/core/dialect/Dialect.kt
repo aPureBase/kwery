@@ -45,7 +45,7 @@ interface Dialect {
     val supportsFetchingGeneratedKeysByName: Boolean
 
     fun arrayBasedIn(name: String): String
-
+    fun arrayBasedIn(paramName: String, values: Collection<Any>): String = throw TODO("Not Implemented")
     fun allocateIds(count: Int, sequence: String, columnName: String): String
 
     fun applyLimitAndOffset(limit: Int?, offset: Int?, sql: String): String {

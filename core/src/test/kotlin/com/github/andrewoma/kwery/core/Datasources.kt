@@ -38,6 +38,13 @@ val mysqlDataSource = HikariDataSource().apply {
     password = "kwery"
 }
 
+val sqlserverDataSource = HikariDataSource().apply {
+    jdbcUrl = "jdbc:sqlserver://localhost:1433;databaseName=model"
+    username = "sa"
+    password = "yourStrong(!)Password"
+}
+
+
 val sqliteDataSource = HikariDataSource().apply {
     jdbcUrl = "jdbc:sqlite::memory:"
 }

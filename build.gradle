@@ -8,6 +8,7 @@ buildscript {
         hsqlVersion = '2.3.4'
         postgresVersion = '9.4.1208'
         mysqlVersion = '5.1.38'
+        mssqlVersion = '6.3.6.jre8-preview'
         jerseyVersion = '2.23.1'
         dropwizardVersion = '1.0.0'
         jacksonVersion = '2.7.0'
@@ -143,6 +144,7 @@ project(':core') {
                 "org.postgresql:postgresql:$postgresVersion",
                 "mysql:mysql-connector-java:$mysqlVersion",
                 "org.xerial:sqlite-jdbc:3.8.11.2",
+                "com.microsoft.sqlserver:mssql-jdbc:$mssqlVersion",
         )
     }
 }

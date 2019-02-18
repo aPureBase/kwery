@@ -432,6 +432,16 @@ abstract class AbstractDao<T : Any, ID : Any>(
             id(table.rowMapper(table.idColumns, nf)(row))
         }
     }
+
+    private fun Session.createArrayOf(key: String, sqlType: String?, array: kotlin.Array<Any>): Array {
+        return connection.createArrayOf(sqlType, array)
+    }
+
+    private fun Session.createWheresOf(key: String, sqlType: String?, array: kotlin.Array<Any>):  Map<String, Any?> {
+        return array.mapIndexed { index, value ->
+            "$key$index" to value
+        }.toMap()
+    }
 }
 
 enum class IdStrategy {

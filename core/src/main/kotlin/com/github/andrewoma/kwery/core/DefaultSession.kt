@@ -229,8 +229,12 @@ class DefaultSession(override val connection: Connection,
         return DefaultTransaction(this)
     }
 
-    private fun <R> withPreparedStatement(sql: String, parameters: List<Map<String, Any?>> = listOf(), options: StatementOptions,
-                                          f: (ExecutingStatement, PreparedStatement) -> Pair<ExecutingStatement, R>): R {
+    private fun <R> withPreparedStatement(
+        sql: String,
+        parameters: List<Map<String, Any?>> = listOf(),
+        options: StatementOptions,
+        f: (ExecutingStatement, PreparedStatement) -> Pair<ExecutingStatement, R>
+    ): R {
         var statement = ExecutingStatement(this, hashMapOf(), sql, parameters, options)
         try {
             statement = interceptor.construct(statement)
@@ -263,10 +267,13 @@ class DefaultSession(override val connection: Connection,
         }
     }
 
-    private fun createStatementCacheKey(options: StatementOptions, sql: String, statement: ExecutingStatement): StatementCacheKey {
-        return StatementCacheKey(sql, statement.inClauseSizes, if (options.applyNameToQuery) options.name else null,
-                options.limit != null, options.offset != null)
-    }
+    private fun createStatementCacheKey(options: StatementOptions, sql: String, statement: ExecutingStatement) = StatementCacheKey(
+        sql = sql,
+        collections = statement.inClauseSizes,
+        name = if (options.applyNameToQuery) options.name else null,
+        limit = options.limit != null,
+        offset = options.offset != null
+    )
 
     private fun prepareStatement(sql: String, options: StatementOptions): PreparedStatement {
         val statement = if (options.useGeneratedKeys || options.generatedKeyColumns.isNotEmpty()) {
@@ -358,5 +365,10 @@ data class ExecutingStatement(
 /**
  * StatementCacheKey contains the sql and any options that modify the generated prepared statement
  */
-data class StatementCacheKey(val sql: String, val collections: Map<String, Int>, val name: String?,
-                             val limit: Boolean, val offset: Boolean)
+data class StatementCacheKey(
+    val sql: String,
+    val collections: Map<String, Int>,
+    val name: String?,
+    val limit: Boolean,
+    val offset: Boolean
+)

@@ -22,10 +22,7 @@
 
 package com.github.andrewoma.kwery.core
 
-import com.github.andrewoma.kwery.core.dialect.Dialect
-import com.github.andrewoma.kwery.core.dialect.MysqlDialect
-import com.github.andrewoma.kwery.core.dialect.PostgresDialect
-import com.github.andrewoma.kwery.core.dialect.SqliteDialect
+import com.github.andrewoma.kwery.core.dialect.*
 import com.zaxxer.hikari.pool.ProxyConnection
 import org.junit.Test
 import org.postgresql.largeobject.LargeObjectManager
@@ -52,8 +49,16 @@ abstract class AbstractDialectTest(dataSource: DataSource, dialect: Dialect) : A
         session.update("delete from test")
     }
 
-    data class Value(val time: Time, val date: Date, val timestamp: Timestamp, val binary: String,
-                     val varchar: String, val blob: String, val clob: String, val ints: List<Int>)
+    data class Value(
+        val time: Time,
+        val date: Date,
+        val timestamp: Timestamp,
+        val binary: String,
+        val varchar: String,
+        val blob: String,
+        val clob: String,
+        val ints: List<Int>
+    )
 
     @Test fun `Array based select should work inlined`() {
         if (!dialect.supportsArrayBasedIn) return
@@ -74,16 +79,20 @@ abstract class AbstractDialectTest(dataSource: DataSource, dialect: Dialect) : A
     }
 
     @Test fun `Bindings to blobs and clobs via streams`() {
-        if (session.dialect is PostgresDialect || session.dialect is SqliteDialect) return
+        if (
+            session.dialect is PostgresDialect ||
+            session.dialect is SqliteDialect ||
+            session.dialect is SqlServerDialect
+        ) return
 
         val now = System.currentTimeMillis()
         val value = Value(Time(now), Date(now), Timestamp(now), "binary",
-                "var'char", "blob", "clob", listOf(1, 2, 3))
+            "var'char", "blob", "clob", listOf(1, 2, 3))
 
         val params = createParams(value) + mapOf(
-                "id" to "streams",
-                "blob_col" to ByteArrayInputStream(value.blob.toByteArray(Charsets.UTF_8)),
-                "clob_col" to StringReader(value.clob)
+            "id" to "streams",
+            "blob_col" to ByteArrayInputStream(value.blob.toByteArray(Charsets.UTF_8)),
+            "clob_col" to StringReader(value.clob)
         )
 
         assertEquals(1, session.update(insertSql, params))
@@ -105,7 +114,7 @@ abstract class AbstractDialectTest(dataSource: DataSource, dialect: Dialect) : A
     @Test fun `Bindings to literals should return the same values when fetched`() {
         val now = System.currentTimeMillis()
         val value = Value(Time(now), Date(now), Timestamp(now), "binary",
-                "var'char", "blob", "clob", listOf(1, 2, 3))
+            "var'char", "blob", "clob", listOf(1, 2, 3))
 
         session.update(insertSql, createParams(value) + mapOf("id" to "params"))
 
@@ -120,14 +129,14 @@ abstract class AbstractDialectTest(dataSource: DataSource, dialect: Dialect) : A
     }
 
     private fun createParams(value: Value) = mapOf(
-            "time_col" to value.time,
-            "date_col" to value.date,
-            "timestamp_col" to value.timestamp,
-            "binary_col" to value.binary.toByteArray(Charsets.UTF_8),
-            "varchar_col" to value.varchar,
-            "blob_col" to toBlob(value.blob),
-            "clob_col" to toClob(value.clob),
-            "array_col" to if (dialect is MysqlDialect) "" else session.connection.createArrayOf("int", value.ints.toTypedArray())
+        "time_col" to value.time,
+        "date_col" to value.date,
+        "timestamp_col" to value.timestamp,
+        "binary_col" to value.binary.toByteArray(Charsets.UTF_8),
+        "varchar_col" to value.varchar,
+        "blob_col" to toBlob(value.blob),
+        "clob_col" to toClob(value.clob),
+        "array_col" to if (dialect is MysqlDialect || dialect is SqlServerDialect) "" else session.connection.createArrayOf("int", value.ints.toTypedArray())
     )
 
     @Test fun `Allocate ids should contain a unique sequence of ids`() {
@@ -197,13 +206,13 @@ abstract class AbstractDialectTest(dataSource: DataSource, dialect: Dialect) : A
     private fun findById(id: String): Value {
         return session.select("select * from dialect_test where id = '$id'") { row ->
             Value(row.time("time_col"),
-                    row.date("date_col"),
-                    row.timestamp("timestamp_col"),
-                    String(row.bytes("binary_col"), Charsets.UTF_8),
-                    row.string("varchar_col"),
-                    fromBlob(row, "blob_col"),
-                    fromClob(row, "clob_col"),
-                    if (dialect is MysqlDialect || dialect is SqliteDialect) listOf() else row.array<Int>("array_col"))
+                row.date("date_col"),
+                row.timestamp("timestamp_col"),
+                String(row.bytes("binary_col"), Charsets.UTF_8),
+                row.string("varchar_col"),
+                fromBlob(row, "blob_col"),
+                fromClob(row, "clob_col"),
+                if (dialect is MysqlDialect || dialect is SqliteDialect) listOf() else row.array<Int>("array_col"))
         }.single()
     }
 
