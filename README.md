@@ -212,8 +212,5 @@ Robustness/Performance:
 * Soak test - check for leaking connections/resources over extended usage
 * Profile array based in clauses on large tables
 
-Misc:
-* Better IDE support for highlighting inline SQL. Vote for [KT-6610](https://youtrack.jetbrains.com/issue/KT-6610)
-
 #### License
 This project is licensed under a MIT license.
