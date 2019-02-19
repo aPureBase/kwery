@@ -17,6 +17,8 @@ Credits to the original author for his work._
 Kwery is available in [Maven Central](http://search.maven.org/#search%7Cga%7C1%7Candrewoma.kwery)
 and [jcenter](https://bintray.com/bintray/jcenter/com.github.andrewoma.kwery%3Acore).
 
+## Modules
+
 #### Core
 
 The [core module](core) is a fairly thin wrapper over JDBC, providing support for named parameters, logging
