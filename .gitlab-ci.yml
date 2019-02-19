@@ -1,0 +1,34 @@
+image: java:8
+
+stages:
+  - test
+
+before_script:
+  - chmod +x ./gradlew
+  - export GRADLE_USER_HOME=`pwd`/.gradle
+
+tests:
+  stage: test
+  variables:
+    # MySQL
+    MYSQL_DATABASE: kwery
+    MYSQL_USER: kwery
+    MYSQL_ROOT_PASSWORD: kwery
+
+    # Postgres
+    POSTGRES_DB: kwery
+    POSTGRES_USER: kwery
+    POSTGRES_PASSWORD: kwery
+
+    # Non Services variables
+    GRADLE_OPTS: "-Dorg.gradle.daemon=false"
+  services:
+    - postgres
+    - mysql
+  cache:
+    paths:
+      - build
+      - .gradle
+  script:
+    - echo test
+    - ./gradlew --info check

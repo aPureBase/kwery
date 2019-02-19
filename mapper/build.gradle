@@ -1,0 +1,13 @@
+dependencies {
+    compile(
+            project(':core'),
+            "com.github.andrewoma.kommon:kommon:$kommonVersion",
+    )
+    testCompile(
+            project(':fetcher'),
+            "com.zaxxer:HikariCP:$hikariVersion",
+            "ch.qos.logback:logback-classic:$logbackVersion",
+            "org.hsqldb:hsqldb:$hsqlVersion",
+            "mysql:mysql-connector-java:$mysqlVersion",
+    )
+}
