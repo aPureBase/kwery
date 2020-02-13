@@ -68,7 +68,7 @@ allprojects {
         configurations = ['archives']
         pkg {
             repo = 'apurebase'
-            name = project.name
+            name = 'kwery-' + project.name
             licenses = ['MIT']
             vcsUrl = 'https://github.com/aPureBase/kwery'
             websiteUrl = 'https://github.com/aPureBase/kwery'
@@ -84,7 +84,7 @@ allprojects {
                 MyPublication(MavenPublication) {
                     from components.java
                     groupId project.group
-                    artifactId project.name
+                    artifactId 'kwery-' + project.name
                     artifact sourcesJar
                     version version
                 }
