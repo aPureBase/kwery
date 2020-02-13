@@ -26,7 +26,7 @@ modifyPom {
     project {
         name 'kwery'
         description 'An SQL library for Kotlin'
-        url 'https://github.com/andrewoma/kwery'
+        url 'https://github.com/aPureBase/kwery'
         packaging 'jar'
 
         licenses {
@@ -38,9 +38,9 @@ modifyPom {
         }
 
         scm {
-            url 'https://github.com/andrewoma/kwery'
-            connection 'scm:git:https://github.com/andrewoma/kwery.git'
-            developerConnection 'scm:git:git@github.com:andrewoma/kwery.git'
+            url 'https://github.com/aPureBase/kwery'
+            connection 'scm:git:https://github.com/aPureBase/kwery.git'
+            developerConnection 'scm:git:git@github.com:aPureBase/kwery.git'
         }
 
         developers {
@@ -49,6 +49,11 @@ modifyPom {
                 name "Andrew O'Malley"
                 email 'andrewoma@gmail.com'
                 url 'https://github.com/andrewoma'
+            }
+            developer {
+                id 'jeggy'
+                name "Jógvan Olsen"
+                url 'https://github.com/jeggy'
             }
         }
     }

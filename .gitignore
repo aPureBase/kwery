@@ -20,6 +20,7 @@ classes
 .idea/dataSources.xml
 .idea/encodings.xml
 .idea/vcs.xml
+.idea/jarRepositories.xml
 
 ### Intellij+iml ###
 # Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio and WebStorm

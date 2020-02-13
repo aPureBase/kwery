@@ -1,0 +1,50 @@
+name: Test lib
+
+on:
+  push:
+    branches: "**"
+    tags-ignore:
+      - "v*"
+  pull_request:
+    branches: "**"
+    tags-ignore:
+      - "v*"
+
+jobs:
+  test-application:
+    name: Run tests
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:10.8
+        env:
+          POSTGRES_USER: kwery
+          POSTGRES_PASSWORD: kwery
+          POSTGRES_DB: kwery
+        ports:
+          - 5432:5432
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+
+      mysql:
+        image: mysql:5.6
+        env:
+          MYSQL_USER: kwery
+          MYSQL_ROOT_PASSWORD: kwery
+          MYSQL_PASSWORD: kwery
+          MYSQL_DATABASE: kwery
+        ports:
+          - 3336:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
+    steps:
+      -   uses: actions/checkout@v2
+      -   name: Set up JDK 8
+          uses: actions/setup-java@v1
+          with:
+            java-version: 8
+      -   name: Clean
+          run: ./gradlew clean
+      -   name: Test
+          run: ./gradlew check
+      -   name: Build
+          run: ./gradlew assemble

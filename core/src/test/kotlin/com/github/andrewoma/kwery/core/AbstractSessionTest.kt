@@ -56,8 +56,7 @@ abstract class AbstractSessionTest(val dataSource: DataSource = hsqlDataSource, 
         println("\n==== Starting '${name.methodName}'")
     }
 
-    open fun afterSessionSetup() {
-    }
+    open fun afterSessionSetup() {}
 
     fun initialise(token: String, f: () -> Unit) {
         if (initialised.contains(token)) return
