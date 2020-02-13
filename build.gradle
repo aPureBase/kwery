@@ -1,22 +1,17 @@
-buildscript {
-    repositories {
-        jcenter()
-    }
-    dependencies {
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
-        classpath "com.github.ben-manes:gradle-versions-plugin:0.20.0"
-    }
+plugins {
+    id "org.jetbrains.kotlin.jvm" version kotlinVersion
+    id "com.github.ben-manes.versions" version "0.24.0"
+    id "com.jfrog.bintray" version "1.8.4"
+    id "maven-publish"
 }
 
 allprojects {
-    group = 'com.github.andrewoma'
-    apply plugin: 'com.github.ben-manes.versions'
-
     version version
+    group = 'com.apurebase'
 
     apply plugin: 'kotlin'
     apply plugin: 'maven-publish'
-    apply plugin: 'com.github.ben-manes.versions'
+    apply plugin: "com.jfrog.bintray"
 
     repositories {
         jcenter()
@@ -28,37 +23,16 @@ allprojects {
         compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
         compile "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
         compile "org.slf4j:slf4j-api:$slf4jVersion"
-        
+
         testCompile "org.jetbrains.kotlin:kotlin-test-junit:$kotlinVersion"
         testCompile "org.jmockit:jmockit:1.45"
         testRuntime "org.junit.jupiter:junit-jupiter-engine:$junitVersion"
         testImplementation "org.junit.jupiter:junit-jupiter-api:$junitVersion"
         testImplementation 'org.amshove.kluent:kluent:1.34'
     }
-}
 
-subprojects {
-    sourceSets {
-        main {
-            kotlin {
-                srcDir "src/main/kotlin"
-            }
-            resources {
-                srcDir "src/main/resources"
-            }
-        }
-        test {
-            kotlin {
-                srcDir "src/test/kotlin"
-            }
-            resources {
-                srcDir "src/test/resources"
-            }
-        }
-    }
-
-    task sourcesJar(type: Jar) {
-        classifier = 'sources'
+    task sourcesJar(type: Jar, dependsOn: classes) {
+        archiveClassifier.set 'sources'
         from sourceSets.main.allSource
     }
 
@@ -66,25 +40,64 @@ subprojects {
         archives sourcesJar
     }
 
-    test {
-        useJUnitPlatform {
-            excludeTags 'slow'
-            includeEngines 'junit-jupiter'
-        }
+    task sourceJar(type: Jar) {
+        from sourceSets.main.allSource
+    }
 
-        testLogging {
-            events "failed"
-            exceptionFormat "full"
-        }
-
-        failFast = false
-
-        doFirst {
-            def jMockit = configurations.testCompile.find {
-                it.name.startsWith("jmockit-")
+    bintray {
+        user = System.getenv('BINTRAY_USER')
+        key = System.getenv('BINTRAY_KEY')
+        publish = true
+        publications = ['MyPublication']
+        configurations = ['archives']
+        pkg {
+            repo = 'apurebase'
+            name = project.name
+            licenses = ['MIT']
+            vcsUrl = 'https://github.com/aPureBase/kwery'
+            websiteUrl = 'https://github.com/aPureBase/kwery'
+            issueTrackerUrl = 'https://github.com/aPureBase/kwery/issues'
+            version {
+                name = project.version
+                released = new Date()
             }
-            jvmArgs "-javaagent:${jMockit}"
+        }
+
+        publishing {
+            publications {
+                MyPublication(MavenPublication) {
+                    from components.java
+                    groupId project.group
+                    artifactId project.name
+                    artifact sourcesJar
+                    version version
+                }
+            }
         }
     }
 }
+
+//subprojects {
+//
+//    test {
+//        useJUnitPlatform {
+//            excludeTags 'slow'
+//            includeEngines 'junit-jupiter'
+//        }
+//
+//        testLogging {
+//            events "failed"
+//            exceptionFormat "full"
+//        }
+//
+//        failFast = false
+//
+//        doFirst {
+//            def jMockit = configurations.testCompile.find {
+//                it.name.startsWith("jmockit-")
+//            }
+//            jvmArgs "-javaagent:${jMockit}"
+//        }
+//    }
+//}
 
