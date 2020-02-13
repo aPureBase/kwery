@@ -45,11 +45,6 @@ allprojects {
     }
 
     test {
-        useJUnitPlatform {
-            excludeTags 'slow'
-            includeEngines 'junit-jupiter'
-        }
-
         testLogging {
             events "failed"
             exceptionFormat "full"

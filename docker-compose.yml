@@ -9,7 +9,7 @@ services:
       MYSQL_PASSWORD: kwery
       MYSQL_ROOT_PASSWORD: kwery
     ports:
-      - 3306:3306
+      - 3336:3306
 
   postgres:
     image: postgres
