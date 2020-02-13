@@ -44,6 +44,27 @@ allprojects {
         from sourceSets.main.allSource
     }
 
+    test {
+        useJUnitPlatform {
+            excludeTags 'slow'
+            includeEngines 'junit-jupiter'
+        }
+
+        testLogging {
+            events "failed"
+            exceptionFormat "full"
+        }
+
+        failFast = false
+
+        doFirst {
+            def jMockit = configurations.testCompile.find {
+                it.name.startsWith("jmockit-")
+            }
+            jvmArgs "-javaagent:${jMockit}"
+        }
+    }
+
     bintray {
         user = System.getenv('BINTRAY_USER')
         key = System.getenv('BINTRAY_KEY')
