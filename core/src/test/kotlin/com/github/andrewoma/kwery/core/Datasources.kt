@@ -25,7 +25,7 @@ package com.github.andrewoma.kwery.core
 import com.zaxxer.hikari.HikariDataSource
 
 val hsqlDataSource = HikariDataSource().apply {
-    jdbcUrl = "jdbc:hsqldb:mem:kwery"
+    jdbcUrl = "jdbc:hsqldb://localhost:kwery"
 }
 
 val postgresDataSource = HikariDataSource().apply {

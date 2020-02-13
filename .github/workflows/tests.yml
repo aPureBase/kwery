@@ -18,7 +18,7 @@ jobs:
       postgres:
         image: postgres:10.8
         env:
-          POSTGRES_USER: postgres
+          POSTGRES_USER: kwery
           POSTGRES_PASSWORD: kwery
           POSTGRES_DB: kwery
         ports:
@@ -26,12 +26,12 @@ jobs:
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
 
       mysql:
-        image: mysql:5.7
+        image: mysql:5.6
         env:
           MYSQL_USER: kwery
           MYSQL_ROOT_PASSWORD: kwery
           MYSQL_PASSWORD: kwery
-          MYSQL_DB: kwery
+          MYSQL_DATABASE: kwery
         ports:
           - 3336:3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
